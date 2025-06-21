@@ -83,6 +83,15 @@
       line-height: 1.6;
     }
 
+    .delete-btn {
+      margin-top: 1rem;
+      background: #aa0000;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
     footer {
       text-align: center;
       padding: 2rem 1rem;
@@ -110,4 +119,48 @@
 
     <div id="storyList">
       <!-- Stories will appear here -->
-    </
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 Short Story Hub — Made with words.
+  </footer>
+
+  <script>
+    const form = document.getElementById('storyForm');
+    const storyList = document.getElementById('storyList');
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const title = document.getElementById('title').value;
+      const content = document.getElementById('content').value;
+
+      const storyDiv = document.createElement('div');
+      storyDiv.className = 'story';
+
+      const storyTitle = document.createElement('h2');
+      storyTitle.textContent = title;
+
+      const storyContent = document.createElement('p');
+      storyContent.textContent = content;
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.className = 'delete-btn';
+
+      deleteBtn.addEventListener('click', () => {
+        storyList.removeChild(storyDiv);
+      });
+
+      storyDiv.appendChild(storyTitle);
+      storyDiv.appendChild(storyContent);
+      storyDiv.appendChild(deleteBtn);
+
+      storyList.prepend(storyDiv);
+
+      form.reset();
+    });
+  </script>
+</body>
+</html>
