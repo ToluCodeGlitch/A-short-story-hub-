@@ -6,212 +6,125 @@
   <title>Short Story Hub</title>
   <style>
     body {
-      font-family: 'Georgia', serif;
-      background: #fefefe;
-      margin: 0;
-      padding: 0;
-      color: #222;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+      max-width: 600px;
+      margin: auto;
     }
-
-    header {
-      text-align: center;
-      padding: 3rem 1rem 1rem;
-      background: #f4f4f4;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
     h1 {
-      margin: 0;
-      font-size: 2.5rem;
+      text-align: center;
     }
-
-    p.tagline {
-      margin-top: 0.5rem;
-      font-style: italic;
-      color: #666;
-    }
-
-    main {
-      max-width: 700px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-
-    form {
-      margin-bottom: 2rem;
-      background: #fff;
-      padding: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border-left: 4px solid #444;
-    }
-
-    input[type="text"],
-    textarea {
+    textarea, input {
       width: 100%;
-      padding: 0.7rem;
-      margin-top: 0.5rem;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      font-family: 'Georgia', serif;
+      margin: 10px 0;
+      padding: 10px;
       font-size: 1rem;
     }
-
-    button {
-      background: #333;
-      color: white;
-      padding: 0.7rem 1.2rem;
-      border: none;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
     .story {
       background: #fff;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      border-left: 4px solid #333;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 15px;
+      margin-top: 15px;
+      border-left: 4px solid #222;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
       position: relative;
     }
-
-    .story h2 {
-      margin-top: 0;
-      font-size: 1.5rem;
-      color: #333;
-    }
-
-    .story p {
-      line-height: 1.6;
-    }
-
-    .meta {
+    .timestamp {
       font-size: 0.8rem;
-      color: #666;
-      margin-top: 0.5rem;
+      color: #777;
     }
-
+    button {
+      padding: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-right: 10px;
+    }
     .delete-btn {
       position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: #e74c3c;
+      right: 10px;
+      top: 10px;
+      background: crimson;
       color: white;
       border: none;
-      padding: 0.4rem 0.7rem;
-      cursor: pointer;
+      padding: 5px 10px;
       font-size: 0.8rem;
-    }
-
-    footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.9rem;
-      color: #aaa;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Short Story Hub</h1>
-    <p class="tagline">Fiction. Truth. Everything in between.</p>
-  </header>
 
-  <main>
-    <form id="storyForm">
-      <label for="title">Story Title</label>
-      <input type="text" id="title" name="title" required placeholder="e.g. A Night in Lagos" />
+  <h1>📖 Short Story Hub</h1>
 
-      <label for="content">Story</label>
-      <textarea id="content" name="content" rows="6" required placeholder="Write your story here..."></textarea>
+  <textarea id="storyInput" rows="5" placeholder="Write your story here..."></textarea>
+  <button onclick="submitStory()">Submit</button>
+  <button onclick="clearAll()">Clear All</button>
 
-      <button type="submit">Submit Story</button>
-    </form>
-
-    <div id="storyList"></div>
-  </main>
-
-  <footer>
-    &copy; 2025 Short Story Hub — Made with words.
-  </footer>
+  <div id="storiesContainer"></div>
 
   <script>
-    const form = document.getElementById('storyForm');
-    const storyList = document.getElementById('storyList');
-
-    function timeAgo(timestamp) {
-      const now = Date.now();
-      const seconds = Math.floor((now - timestamp) / 1000);
-
-      if (seconds < 60) return 'Posted just now';
+    const getTimeAgo = (timestamp) => {
+      const seconds = Math.floor((Date.now() - timestamp) / 1000);
+      if (seconds < 60) return `${seconds}s ago`;
       const minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return `Posted ${minutes} min${minutes > 1 ? 's' : ''} ago`;
+      if (minutes < 60) return `${minutes}m ago`;
       const hours = Math.floor(minutes / 60);
-      if (hours < 24) return `Posted ${hours} hour${hours > 1 ? 's' : ''} ago`;
+      if (hours < 24) return `${hours}h ago`;
       const days = Math.floor(hours / 24);
-      return `Posted ${days} day${days > 1 ? 's' : ''} ago`;
-    }
-
-    function saveStories(stories) {
-      localStorage.setItem('stories', JSON.stringify(stories));
-    }
-
-    function loadStories() {
-      const data = localStorage.getItem('stories');
-      return data ? JSON.parse(data) : [];
-    }
-
-    function deleteStory(index) {
-      const stories = loadStories();
-      stories.splice(index, 1);
-      saveStories(stories);
-      renderStories();
-    }
+      return `${days}d ago`;
+    };
 
     function renderStories() {
-      const stories = loadStories();
-      storyList.innerHTML = '';
+      const container = document.getElementById("storiesContainer");
+      const stories = JSON.parse(localStorage.getItem("stories")) || [];
+      container.innerHTML = "";
+
       stories.forEach((story, index) => {
-        const div = document.createElement('div');
-        div.className = 'story';
+        const div = document.createElement("div");
+        div.className = "story";
 
-        const h2 = document.createElement('h2');
-        h2.textContent = story.title;
+        const content = document.createElement("p");
+        content.textContent = story.text;
 
-        const p = document.createElement('p');
-        p.textContent = story.content;
+        const time = document.createElement("div");
+        time.className = "timestamp";
+        time.textContent = getTimeAgo(story.timestamp);
 
-        const meta = document.createElement('p');
-        meta.className = 'meta';
-        meta.textContent = timeAgo(story.timestamp);
+        const del = document.createElement("button");
+        del.className = "delete-btn";
+        del.textContent = "Delete";
+        del.onclick = () => {
+          stories.splice(index, 1);
+          localStorage.setItem("stories", JSON.stringify(stories));
+          renderStories();
+        };
 
-        const btn = document.createElement('button');
-        btn.className = 'delete-btn';
-        btn.textContent = 'Delete';
-        btn.onclick = () => deleteStory(index);
-
-        div.appendChild(h2);
-        div.appendChild(p);
-        div.appendChild(meta);
-        div.appendChild(btn);
-
-        storyList.prepend(div);
+        div.appendChild(content);
+        div.appendChild(time);
+        div.appendChild(del);
+        container.appendChild(div);
       });
     }
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const title = document.getElementById('title').value;
-      const content = document.getElementById('content').value;
-      const newStory = { title, content, timestamp: Date.now() };
-
-      const stories = loadStories();
-      stories.push(newStory);
-      saveStories(stories);
+    function submitStory() {
+      const input = document.getElementById("storyInput");
+      const text = input.value.trim();
+      if (!text) return;
+      const stories = JSON.parse(localStorage.getItem("stories")) || [];
+      stories.unshift({ text, timestamp: Date.now() });
+      localStorage.setItem("stories", JSON.stringify(stories));
+      input.value = "";
       renderStories();
-      form.reset();
-    });
+    }
+
+    function clearAll() {
+      if (confirm("Delete all stories?")) {
+        localStorage.removeItem("stories");
+        renderStories();
+      }
+    }
 
     renderStories();
   </script>
+
 </body>
 </html>
