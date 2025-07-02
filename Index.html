@@ -4,146 +4,212 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Short Story Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg-light: #ffffff;
+      --bg-dark: #121212;
+      --text-light: #000000;
+      --text-dark: #f5f5f5;
+      --card-bg-light: #f9f9f9;
+      --card-bg-dark: #1e1e1e;
+      --primary: #4B9CD3;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    header {
+      background: url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1470&q=80') center/cover no-repeat;
+      padding: 80px 20px 40px;
+      text-align: center;
+      color: white;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      margin-top: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
       padding: 20px;
-      background-color: #ffffff;
-      color: #000000;
-      transition: background-color 0.3s, color 0.3s;
     }
 
-    h1 {
-      font-size: 2em;
-      margin-bottom: 10px;
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    button, input, textarea {
-      font-family: inherit;
-      font-size: 1em;
-      padding: 10px;
-      margin: 10px 0;
-      width: 100%;
-      max-width: 500px;
-      box-sizing: border-box;
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    input, textarea {
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    button {
+      padding: 12px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #357ab7;
     }
 
     .story {
-      background: #f4f4f4;
-      padding: 10px;
-      border-left: 4px solid #333;
-      margin: 10px 0;
+      background-color: var(--card-bg-light);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .story h3 {
+      margin-top: 0;
+      font-family: 'Playfair Display', serif;
     }
 
     .delete-btn {
+      margin-top: 10px;
       background: #e74c3c;
-      color: white;
-      border: none;
-      cursor: pointer;
     }
 
-    /* Dark Mode Styles */
-    body.dark-mode {
-      background-color: #121212;
-      color: #f0f0f0;
+    .dark body {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
     }
 
-    textarea.dark-mode,
-    input.dark-mode,
-    button.dark-mode {
-      background-color: #1e1e1e;
-      color: #f0f0f0;
+    .dark .story {
+      background-color: var(--card-bg-dark);
+    }
+
+    .dark input, .dark textarea {
+      background-color: #2a2a2a;
+      color: #f5f5f5;
       border: 1px solid #444;
     }
 
-    .story.dark-mode {
-      background: #1a1a1a;
-      border-left-color: #999;
+    .dark button {
+      background-color: #2980b9;
+    }
+
+    #toggle-theme {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #eee;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .dark #toggle-theme {
+      background: #333;
+      color: white;
     }
   </style>
 </head>
 <body>
-  <h1>📖 Short Story Hub</h1>
-  <button id="toggle-dark-mode">🌙 Toggle Dark Mode</button>
+  <button id="toggle-theme">Toggle Theme</button>
+  <header>
+    <h1>Short Story Hub</h1>
+    <p>One story. One voice. One moment.</p>
+  </header>
 
-  <input type="text" id="titleInput" placeholder="Story Title" />
-  <textarea id="storyInput" placeholder="Write your story here..." rows="5"></textarea>
-  <button onclick="submitStory()">Submit Story</button>
+  <div class="container">
+    <h2>Submit Your Story</h2>
+    <form id="storyForm">
+      <input type="text" id="title" placeholder="Story Title" required />
+      <textarea id="story" placeholder="Write your story here..." rows="6" required></textarea>
+      <button type="submit">Submit Story</button>
+    </form>
 
-  <div id="storyList"></div>
+    <h2>Stories</h2>
+    <div id="stories"></div>
+  </div>
 
   <script>
-    // Dark mode setup
-    const darkModeBtn = document.getElementById('toggle-dark-mode');
+    const body = document.body;
+    const toggleBtn = document.getElementById('toggle-theme');
+    const form = document.getElementById('storyForm');
+    const storiesDiv = document.getElementById('stories');
 
-    if (localStorage.getItem('darkMode') === 'enabled') {
-      enableDarkMode();
+    // Load theme
+    if (localStorage.getItem('theme') === 'dark') {
+      body.classList.add('dark');
     }
 
-    darkModeBtn.addEventListener('click', () => {
-      const isEnabled = localStorage.getItem('darkMode') === 'enabled';
-      if (isEnabled) {
-        disableDarkMode();
-      } else {
-        enableDarkMode();
-      }
-    });
+    toggleBtn.onclick = () => {
+      body.classList.toggle('dark');
+      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+    };
 
-    function enableDarkMode() {
-      document.body.classList.add('dark-mode');
-      document.querySelectorAll('textarea, input, button, .story').forEach(el => el.classList.add('dark-mode'));
-      localStorage.setItem('darkMode', 'enabled');
-    }
+    // Load stories
+    const stories = JSON.parse(localStorage.getItem('stories') || '[]');
+    stories.forEach(story => renderStory(story));
 
-    function disableDarkMode() {
-      document.body.classList.remove('dark-mode');
-      document.querySelectorAll('textarea, input, button, .story').forEach(el => el.classList.remove('dark-mode'));
-      localStorage.setItem('darkMode', 'disabled');
-    }
-
-    // Story submission
-    let stories = JSON.parse(localStorage.getItem('stories')) || [];
-
-    function submitStory() {
-      const title = document.getElementById('titleInput').value.trim();
-      const story = document.getElementById('storyInput').value.trim();
-      if (!title || !story) return;
-
-      const newStory = {
-        id: Date.now(),
-        title,
-        story
+    function renderStory(story) {
+      const storyEl = document.createElement('div');
+      storyEl.className = 'story';
+      storyEl.innerHTML = `
+        <h3>${story.title}</h3>
+        <p>${story.content.replace(/\n/g, '<br>')}</p>
+        <button class="delete-btn">Delete</button>
+      `;
+      const deleteBtn = storyEl.querySelector('.delete-btn');
+      deleteBtn.onclick = () => {
+        const index = stories.findIndex(s => s.id === story.id);
+        if (index !== -1) {
+          stories.splice(index, 1);
+          localStorage.setItem('stories', JSON.stringify(stories));
+          storyEl.remove();
+        }
       };
+      storiesDiv.prepend(storyEl);
+    }
 
-      stories.unshift(newStory);
+    form.onsubmit = e => {
+      e.preventDefault();
+      const title = document.getElementById('title').value.trim();
+      const content = document.getElementById('story').value.trim();
+      if (!title || !content) return;
+      const story = { id: Date.now(), title, content };
+      stories.push(story);
       localStorage.setItem('stories', JSON.stringify(stories));
-      document.getElementById('titleInput').value = '';
-      document.getElementById('storyInput').value = '';
-      displayStories();
-    }
-
-    function deleteStory(id) {
-      stories = stories.filter(story => story.id !== id);
-      localStorage.setItem('stories', JSON.stringify(stories));
-      displayStories();
-    }
-
-    function displayStories() {
-      const container = document.getElementById('storyList');
-      container.innerHTML = '';
-      stories.forEach(({ id, title, story }) => {
-        const div = document.createElement('div');
-        div.className = 'story' + (document.body.classList.contains('dark-mode') ? ' dark-mode' : '');
-        div.innerHTML = `
-          <h3>${title}</h3>
-          <p>${story}</p>
-          <button class="delete-btn" onclick="deleteStory(${id})">Delete</button>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    displayStories();
+      renderStory(story);
+      form.reset();
+    };
   </script>
 </body>
 </html>
