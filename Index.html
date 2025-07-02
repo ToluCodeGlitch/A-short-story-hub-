@@ -8,123 +8,142 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background: #f9f9f9;
-      max-width: 600px;
-      margin: auto;
+      background-color: #ffffff;
+      color: #000000;
+      transition: background-color 0.3s, color 0.3s;
     }
+
     h1 {
-      text-align: center;
+      font-size: 2em;
+      margin-bottom: 10px;
     }
-    textarea, input {
-      width: 100%;
+
+    button, input, textarea {
+      font-family: inherit;
+      font-size: 1em;
+      padding: 10px;
       margin: 10px 0;
-      padding: 10px;
-      font-size: 1rem;
+      width: 100%;
+      max-width: 500px;
+      box-sizing: border-box;
     }
+
     .story {
-      background: #fff;
-      padding: 15px;
-      margin-top: 15px;
-      border-left: 4px solid #222;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      position: relative;
-    }
-    .timestamp {
-      font-size: 0.8rem;
-      color: #777;
-    }
-    button {
+      background: #f4f4f4;
       padding: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-      margin-right: 10px;
+      border-left: 4px solid #333;
+      margin: 10px 0;
     }
+
     .delete-btn {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      background: crimson;
+      background: #e74c3c;
       color: white;
       border: none;
-      padding: 5px 10px;
-      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background-color: #121212;
+      color: #f0f0f0;
+    }
+
+    textarea.dark-mode,
+    input.dark-mode,
+    button.dark-mode {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      border: 1px solid #444;
+    }
+
+    .story.dark-mode {
+      background: #1a1a1a;
+      border-left-color: #999;
     }
   </style>
 </head>
 <body>
-
   <h1>📖 Short Story Hub</h1>
+  <button id="toggle-dark-mode">🌙 Toggle Dark Mode</button>
 
-  <textarea id="storyInput" rows="5" placeholder="Write your story here..."></textarea>
-  <button onclick="submitStory()">Submit</button>
-  <button onclick="clearAll()">Clear All</button>
+  <input type="text" id="titleInput" placeholder="Story Title" />
+  <textarea id="storyInput" placeholder="Write your story here..." rows="5"></textarea>
+  <button onclick="submitStory()">Submit Story</button>
 
-  <div id="storiesContainer"></div>
+  <div id="storyList"></div>
 
   <script>
-    const getTimeAgo = (timestamp) => {
-      const seconds = Math.floor((Date.now() - timestamp) / 1000);
-      if (seconds < 60) return `${seconds}s ago`;
-      const minutes = Math.floor(seconds / 60);
-      if (minutes < 60) return `${minutes}m ago`;
-      const hours = Math.floor(minutes / 60);
-      if (hours < 24) return `${hours}h ago`;
-      const days = Math.floor(hours / 24);
-      return `${days}d ago`;
-    };
+    // Dark mode setup
+    const darkModeBtn = document.getElementById('toggle-dark-mode');
 
-    function renderStories() {
-      const container = document.getElementById("storiesContainer");
-      const stories = JSON.parse(localStorage.getItem("stories")) || [];
-      container.innerHTML = "";
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      enableDarkMode();
+    }
 
-      stories.forEach((story, index) => {
-        const div = document.createElement("div");
-        div.className = "story";
+    darkModeBtn.addEventListener('click', () => {
+      const isEnabled = localStorage.getItem('darkMode') === 'enabled';
+      if (isEnabled) {
+        disableDarkMode();
+      } else {
+        enableDarkMode();
+      }
+    });
 
-        const content = document.createElement("p");
-        content.textContent = story.text;
+    function enableDarkMode() {
+      document.body.classList.add('dark-mode');
+      document.querySelectorAll('textarea, input, button, .story').forEach(el => el.classList.add('dark-mode'));
+      localStorage.setItem('darkMode', 'enabled');
+    }
 
-        const time = document.createElement("div");
-        time.className = "timestamp";
-        time.textContent = getTimeAgo(story.timestamp);
+    function disableDarkMode() {
+      document.body.classList.remove('dark-mode');
+      document.querySelectorAll('textarea, input, button, .story').forEach(el => el.classList.remove('dark-mode'));
+      localStorage.setItem('darkMode', 'disabled');
+    }
 
-        const del = document.createElement("button");
-        del.className = "delete-btn";
-        del.textContent = "Delete";
-        del.onclick = () => {
-          stories.splice(index, 1);
-          localStorage.setItem("stories", JSON.stringify(stories));
-          renderStories();
-        };
+    // Story submission
+    let stories = JSON.parse(localStorage.getItem('stories')) || [];
 
-        div.appendChild(content);
-        div.appendChild(time);
-        div.appendChild(del);
+    function submitStory() {
+      const title = document.getElementById('titleInput').value.trim();
+      const story = document.getElementById('storyInput').value.trim();
+      if (!title || !story) return;
+
+      const newStory = {
+        id: Date.now(),
+        title,
+        story
+      };
+
+      stories.unshift(newStory);
+      localStorage.setItem('stories', JSON.stringify(stories));
+      document.getElementById('titleInput').value = '';
+      document.getElementById('storyInput').value = '';
+      displayStories();
+    }
+
+    function deleteStory(id) {
+      stories = stories.filter(story => story.id !== id);
+      localStorage.setItem('stories', JSON.stringify(stories));
+      displayStories();
+    }
+
+    function displayStories() {
+      const container = document.getElementById('storyList');
+      container.innerHTML = '';
+      stories.forEach(({ id, title, story }) => {
+        const div = document.createElement('div');
+        div.className = 'story' + (document.body.classList.contains('dark-mode') ? ' dark-mode' : '');
+        div.innerHTML = `
+          <h3>${title}</h3>
+          <p>${story}</p>
+          <button class="delete-btn" onclick="deleteStory(${id})">Delete</button>
+        `;
         container.appendChild(div);
       });
     }
 
-    function submitStory() {
-      const input = document.getElementById("storyInput");
-      const text = input.value.trim();
-      if (!text) return;
-      const stories = JSON.parse(localStorage.getItem("stories")) || [];
-      stories.unshift({ text, timestamp: Date.now() });
-      localStorage.setItem("stories", JSON.stringify(stories));
-      input.value = "";
-      renderStories();
-    }
-
-    function clearAll() {
-      if (confirm("Delete all stories?")) {
-        localStorage.removeItem("stories");
-        renderStories();
-      }
-    }
-
-    renderStories();
+    displayStories();
   </script>
-
 </body>
 </html>
