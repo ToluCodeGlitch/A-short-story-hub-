@@ -4,74 +4,76 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Short Story Hub</title>
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Merriweather', serif;
-      background-color: #f9f9f9;
       margin: 0;
-      padding: 0;
-      color: #222;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
     }
-
     header {
-      background-color: #1e1e1e;
-      padding: 2rem;
-      color: white;
+      background-color: #1c1c1c;
+      color: #fff;
+      padding: 1.5rem;
       text-align: center;
     }
-
     header h1 {
       margin: 0;
-      font-size: 2.8rem;
+      font-size: 2rem;
       letter-spacing: 1px;
     }
-
-    header p {
-      margin-top: 0.5rem;
-      font-size: 1.1rem;
-      font-style: italic;
-      color: #ccc;
-    }
-
-    main {
-      padding: 2rem;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .story {
-      background-color: white;
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
     }
-
-    .story img {
-      width: 100%;
-      max-height: 300px;
-      object-fit: cover;
-      border-radius: 5px;
-      margin-bottom: 1rem;
+    h2 {
+      font-size: 1.5rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.5rem;
+      margin-top: 2rem;
     }
-
-    .story h2 {
-      color: #1e1e1e;
-      margin-bottom: 0.5rem;
+    .story {
+      border-bottom: 1px solid #eee;
+      padding: 1rem 0;
     }
-
+    .story:last-child {
+      border-bottom: none;
+    }
+    .story h3 {
+      margin: 0;
+      color: #0077cc;
+    }
     .story p {
-      font-size: 1rem;
+      margin: 0.5rem 0 0;
       line-height: 1.6;
-      color: #444;
     }
-
     footer {
       text-align: center;
-      padding: 1rem;
+      margin-top: 3rem;
       color: #888;
       font-size: 0.9rem;
+    }
+    img.banner {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    .submit-btn {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .submit-btn:hover {
+      background-color: #005fa3;
     }
   </style>
 </head>
@@ -79,29 +81,33 @@
 
   <header>
     <h1>Short Story Hub</h1>
-    <p>Where words come alive</p>
   </header>
 
-  <main>
+  <div class="container">
+    <img class="banner" src="https://images.unsplash.com/photo-1519682337058-a94d519337bc?auto=format&fit=crop&w=1000&q=80" alt="Stories Banner" />
+    
+    <h2>Latest Stories</h2>
+
     <div class="story">
-      <img src="https://source.unsplash.com/800x300/?typewriter,writing,dark" alt="Story Image">
-      <h2>The Night Dripped in Ink</h2>
-      <p>
-        The silence was heavy. A slow fan creaked above her head as she lit the final candle. One more page to write, one more soul to bleed onto the paper. The room smelled of kerosene, forgotten dreams, and something else—truth.
-      </p>
+      <h3>The Weight of Silence</h3>
+      <p>In a house where no one speaks, the walls remember every scream...</p>
     </div>
 
     <div class="story">
-      <img src="https://source.unsplash.com/800x300/?africa,night,city" alt="Lagos Night">
-      <h2>Concrete Shadows</h2>
-      <p>
-        Lagos never sleeps. But beneath the bridge, something darker stirred. He lit a stick, not to see, but to remember. The world spun in slow motion, like a tape being rewound to a moment he could never change.
-      </p>
+      <h3>When the Wind Stopped</h3>
+      <p>The town knew peace, until the wind forgot how to blow...</p>
     </div>
-  </main>
+
+    <div class="story">
+      <h3>Red Dust in the Sky</h3>
+      <p>He walked through Lagos at night, but time walked through him first...</p>
+    </div>
+
+    <button class="submit-btn">Submit Your Story</button>
+  </div>
 
   <footer>
-    &copy; 2025 Tolu Tobi | Short Story Hub
+    &copy; 2025 Short Story Hub. All rights reserved.
   </footer>
 
 </body>
